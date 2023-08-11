@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ListModule } from './list/list.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }),
       inject: [ConfigService],
     }),
+    FriendsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

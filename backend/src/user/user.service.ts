@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -9,47 +13,58 @@ import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
-  ) {}
+	constructor(
+		@InjectRepository(User) private readonly userRepository: Repository<User>,
+		private readonly jwtService: JwtService,
+	) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const existUser = await this.userRepository.findOne({
-      where: {
-        email: createUserDto.email,
-      },
-    })
-    if (existUser)
-      throw new BadRequestException('Пользователь с таким Email уже существует')
+	async create(createUserDto: CreateUserDto) {
+		const existUser = await this.userRepository.findOne({
+			where: {
+				email: createUserDto.email,
+			},
+		})
+		if (existUser)
+			throw new BadRequestException('Пользователь с таким Email уже существует')
 
-    const user = await this.userRepository.save({
-      email: createUserDto.email,
-      password: await argon2.hash(createUserDto.password),
-    })
+		const user = await this.userRepository.save({
+			email: createUserDto.email,
+			password: await argon2.hash(createUserDto.password),
+		})
 
-    const token = this.jwtService.sign({ email: createUserDto.email })
+		const token = this.jwtService.sign({ email: createUserDto.email })
 
-    return { user, token }
-  }
+		return { user, token }
+	}
 
-  findAll() {
-    return `This action returns all user`
-  }
+	async findAll() {
+		return await this.userRepository.find()
+	}
 
-  async findOne(email: string) {
-    return await this.userRepository.findOne({
-      where: {
-        email,
-      },
-    })
-  }
+	async findOne(email: string) {
+		return await this.userRepository.findOne({
+			where: {
+				email,
+			},
+		})
+	}
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`
-  }
+	async update(id: number, updateUserDto: UpdateUserDto) {
+		const list = await this.userRepository.findOne({
+			where: { id },
+		})
 
-  remove(id: number) {
-    return `This action removes a #${id} user`
-  }
+		if (!list) throw new NotFoundException('Такого аккаунта вы не создавали')
+		return await this.userRepository.update(id, updateUserDto)
+	}
+
+	async remove(id: number) {
+		const user = await this.userRepository.findOne({
+			where: { id },
+		})
+
+		if (!user) throw new NotFoundException('Такого аккаунта вы не создавали')
+
+		return await this.userRepository.delete(id)
+	}
 }

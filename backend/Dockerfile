@@ -1,7 +1,13 @@
-FROM node:16
+FROM node:20.3.1
+
 WORKDIR /app
-COPY . .
+
+COPY package*.json ./
+
 RUN npm install
-RUN yarn build
-EXPOSE 3001
-CMD [ "yarn" , "start:dev" ]
+
+COPY . .
+
+RUN npm run build
+
+CMD [ "npm", "run", "start:dev" ]

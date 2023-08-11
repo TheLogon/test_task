@@ -7,17 +7,18 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	JoinColumn,
+	OneToMany,
 } from 'typeorm'
 
 @Entity()
-export class List {
-	@PrimaryGeneratedColumn({ name: 'list_id' })
+export class Friend {
+	@PrimaryGeneratedColumn({ name: 'friend_id' })
 	id: number
 
 	@Column()
-	text: string
+	email: string
 
-	@ManyToOne(() => User, (user) => user.lists)
+	@ManyToOne(() => User, (user) => user.friends)
 	@JoinColumn({ name: 'user_id' })
 	user: User
 

@@ -1,8 +1,10 @@
-export function getTokenFromLocalStorage(): string {
-	const data = localStorage.getItem("token")
-	const token: string = data ? JSON.parse(data) : ""
-
-	return token
+export function getTokenFromLocalStorage(): string | undefined {
+	const ISSERVER = typeof window === "undefined"
+	if (!ISSERVER) {
+		const data = localStorage.getItem("token")
+		const token: string = data ? JSON.parse(data) : ""
+		return token
+	}
 }
 
 export function setTokenToLocalStorage(key: string, token: string): void {

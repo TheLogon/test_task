@@ -1,5 +1,5 @@
 import { instance } from "@/api/axios.api"
-import { IResponseText, IText } from "@/types/types"
+import { IResponseTextData, IText } from "@/types/types"
 
 export const TextService = {
 	async addText(textData: IText) {
@@ -10,8 +10,16 @@ export const TextService = {
 		const { data } = await instance.get("/lists")
 		return data
 	},
-	async deleteText({ id }: { id: any }) {
+	async deleteText(id: number) {
 		const { data } = await instance.delete(`/lists/${id}`)
+		if (data) return data
+	},
+	async patchText({ id, inputText }: IResponseTextData) {
+		const list = {
+			id: id,
+			text: inputText,
+		}
+		const { data } = await instance.patch(`/lists/${id}`, list)
 		if (data) return data
 	},
 }
